@@ -8,7 +8,7 @@ ALEPH AI Challenge T02 과제 통과 기준(T02-C01 ~ T02-C31)을 100% 충족하
 
 - **공개 결과물 URL (필수)**: `https://wkdtlgns99-cell.github.io/aleph-t02/`
   - *새 시크릿 창에서 별도의 계정 생성, 로그인, 인증, 초대, 비밀번호, OAuth, CAPTCHA 없이 즉시 실행됩니다 (T02-C01 충족).*
-- **소스 저장소 URL (필수)**: `https://github.com/wkdtlgns99-cell/aleph-t02/commit/f5f8c47fce5805e541167961b7c52eb1448f082c`
+- **소스 저장소 URL (필수)**: `https://github.com/wkdtlgns99-cell/aleph-t02/commit/4b54966b01b1105f9984fc93557ce44baae7ce05`
   - *전체 소스 상태를 불변으로 검증할 수 있는 40자리 full commit 영구 링크를 제출합니다.*
 
 ---
