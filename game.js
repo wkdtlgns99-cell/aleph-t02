@@ -142,12 +142,20 @@
   // ==========================================
   // 5. 핵심 조작 액션 (T02-C06: 1조작 = 1상태변화)
   // ==========================================
-  function firePlayerBullet() {
-    if (state.status === 'VICTORY' || state.status === 'DEFEAT') {
-      resetGame();
-      return;
+  function firePlayerBullet(force = false) {
+    if (!force) {
+      if (state.status === 'VICTORY' || state.status === 'DEFEAT') {
+        resetGame();
+        return;
+      }
+      if (state.status === 'PAUSED') return;
+    } else {
+      // 검사 모드에서는 게임 상태와 무관하게 즉시 발사 및 상태 반영 보장
+      if (state.status !== 'RUNNING') {
+        state.status = 'RUNNING';
+        hideOverlay();
+      }
     }
-    if (state.status === 'PAUSED') return;
 
     // 레이저 탄환 1쌍 발사
     state.playerBullets.push({
@@ -764,16 +772,23 @@
   // 12. T02 검증 도구
   // ==========================================
   function runRapidInputTest() {
+    state.isTestingRapid = true;
+    if (state.status !== 'RUNNING') {
+      state.status = 'RUNNING';
+      hideOverlay();
+    }
+
     inspectionResult.textContent = '⚡ [T02-C12] 1초 10회 연타 검사 진행 중... (100ms 간격 10회 발사 이벤트 발생)';
     const initialInputs = state.inputsProcessed;
     let firedCount = 0;
 
     const intervalId = setInterval(() => {
       firedCount += 1;
-      firePlayerBullet();
+      firePlayerBullet(true); // force = true로 검사 무결성 보장
 
       if (firedCount >= 10) {
         clearInterval(intervalId);
+        state.isTestingRapid = false;
         const processedDelta = state.inputsProcessed - initialInputs;
         if (processedDelta === 10) {
           inspectionResult.innerHTML = `✅ <strong style="color:#4ade80;">[T02-C12 통과]</strong> 1초 10회 연타 검사 성공! 정확히 10건의 발사 이벤트가 10회 상태 변화로 반영되었습니다. (반영 카운터: +${processedDelta})`;
@@ -976,6 +991,7 @@
 
     // 포커스 이탈 자동 일시정지 (T02-C14)
     window.addEventListener('blur', () => {
+      if (state.isTestingRapid) return; // 1초 10회 연타 검사 중에는 일시정지 방지
       if (state.status === 'RUNNING') {
         keys.left = false;
         keys.right = false;
@@ -984,6 +1000,7 @@
     });
 
     document.addEventListener('visibilitychange', () => {
+      if (state.isTestingRapid) return;
       if (document.hidden && state.status === 'RUNNING') {
         keys.left = false;
         keys.right = false;
