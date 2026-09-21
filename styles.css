@@ -282,15 +282,17 @@ kbd {
   color: #fff;
   font-size: 1.2rem;
   font-weight: bold;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
   z-index: 10;
   text-align: center;
   padding: 20px;
+  white-space: pre-line;
   transition: opacity 0.2s;
 }
 
 .canvas-overlay.hidden {
-  display: none;
+  display: none !important;
 }
 
 /* 조작 버튼 그룹 */
