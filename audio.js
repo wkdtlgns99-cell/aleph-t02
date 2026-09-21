@@ -1,7 +1,7 @@
 /**
- * Quilltale: 8-Bit Turn-Based Battle
+ * Retro Space Invader: 8-Bit Arcade Shooting
  * Web Audio API 8-Bit Synthesizer Engine (T02-C26, C27)
- * 외부 오디오 파일 의존성 0건 (모든 사운드는 브라우저 내장 오실레이터로 즉석 합성)
+ * 외부 오디오 파일 의존성 0건 (모든 사운드는 브라우저 내장 Web Audio API로 실시간 합성)
  */
 
 class SoundEngine {
@@ -27,9 +27,9 @@ class SoundEngine {
   }
 
   /**
-   * 일반 공격 사운드 (8-bit Square Wave 찌르기)
+   * 플레이어 레이저 발사음 (8-bit 피융 스퀘어파)
    */
-  playAttack() {
+  playShoot() {
     if (this.isMuted) return;
     this.init();
     if (!this.ctx) return;
@@ -40,57 +40,24 @@ class SoundEngine {
       const gain = this.ctx.createGain();
 
       osc.type = 'square';
-      osc.frequency.setValueAtTime(480, t);
-      osc.frequency.exponentialRampToValueAtTime(140, t + 0.12);
+      osc.frequency.setValueAtTime(880, t);
+      osc.frequency.exponentialRampToValueAtTime(110, t + 0.09);
 
-      gain.gain.setValueAtTime(0.25, t);
-      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.09);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
 
       osc.start(t);
-      osc.stop(t + 0.12);
+      osc.stop(t + 0.09);
     } catch (e) {}
   }
 
   /**
-   * 룬 스킬 사운드 (아르페지오 신스 광선)
+   * 적/보스 탄환 발사음
    */
-  playSkill() {
-    if (this.isMuted) return;
-    this.init();
-    if (!this.ctx) return;
-
-    try {
-      const notes = [330, 440, 660, 880];
-      const t = this.ctx.currentTime;
-
-      notes.forEach((freq, idx) => {
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        const start = t + idx * 0.04;
-        const dur = 0.08;
-
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(freq, start);
-
-        gain.gain.setValueAtTime(0.2, start);
-        gain.gain.exponentialRampToValueAtTime(0.01, start + dur);
-
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        osc.start(start);
-        osc.stop(start + dur);
-      });
-    } catch (e) {}
-  }
-
-  /**
-   * 방어 / 패링 사운드 (금속성 튕김)
-   */
-  playGuard() {
+  playEnemyShoot() {
     if (this.isMuted) return;
     this.init();
     if (!this.ctx) return;
@@ -100,63 +67,32 @@ class SoundEngine {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(800, t);
-      osc.frequency.exponentialRampToValueAtTime(300, t + 0.15);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(320, t);
+      osc.frequency.exponentialRampToValueAtTime(80, t + 0.1);
 
-      gain.gain.setValueAtTime(0.3, t);
-      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+      gain.gain.setValueAtTime(0.12, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
 
       osc.start(t);
-      osc.stop(t + 0.15);
+      osc.stop(t + 0.1);
     } catch (e) {}
   }
 
   /**
-   * 에테르 물약 회복 사운드 (상승 화음)
+   * 적기 격추 폭발음 (노이즈 합성)
    */
-  playPotion() {
+  playExplosion() {
     if (this.isMuted) return;
     this.init();
     if (!this.ctx) return;
 
     try {
-      const chords = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
       const t = this.ctx.currentTime;
-
-      chords.forEach((freq, i) => {
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        const start = t + i * 0.05;
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, start);
-
-        gain.gain.setValueAtTime(0.25, start);
-        gain.gain.exponentialRampToValueAtTime(0.01, start + 0.12);
-
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        osc.start(start);
-        osc.stop(start + 0.12);
-      });
-    } catch (e) {}
-  }
-
-  /**
-   * 피격 충격 사운드 (노이즈 버스트 폭발음)
-   */
-  playDamage() {
-    if (this.isMuted) return;
-    this.init();
-    if (!this.ctx) return;
-
-    try {
-      const bufferSize = this.ctx.sampleRate * 0.15;
+      const bufferSize = this.ctx.sampleRate * 0.18;
       const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) {
@@ -168,23 +104,130 @@ class SoundEngine {
 
       const filter = this.ctx.createBiquadFilter();
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(800, this.ctx.currentTime);
-      filter.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.15);
+      filter.frequency.setValueAtTime(800, t);
+      filter.frequency.exponentialRampToValueAtTime(60, t + 0.18);
 
       const gain = this.ctx.createGain();
-      gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.3, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.18);
 
       noise.connect(filter);
       filter.connect(gain);
       gain.connect(this.ctx.destination);
 
-      noise.start();
+      noise.start(t);
     } catch (e) {}
   }
 
   /**
-   * 승리 팡파르 (승리 시 1회 발동)
+   * 플레이어 피격음
+   */
+  playPlayerHit() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(160, t);
+      osc.frequency.linearRampToValueAtTime(40, t + 0.15);
+
+      gain.gain.setValueAtTime(0.35, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.15);
+    } catch (e) {}
+  }
+
+  /**
+   * 스마트 폭탄(EMP) 발동음 (대형 광역 폭발)
+   */
+  playBomb() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const t = this.ctx.currentTime;
+      // 노이즈 붐
+      const bufferSize = this.ctx.sampleRate * 0.45;
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = this.ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(1400, t);
+      filter.frequency.exponentialRampToValueAtTime(40, t + 0.45);
+
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0.45, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.45);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+      noise.start(t);
+
+      // 사이버 하강 음향 동시 합성
+      const osc = this.ctx.createOscillator();
+      const oscGain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, t);
+      osc.frequency.exponentialRampToValueAtTime(50, t + 0.45);
+      oscGain.gain.setValueAtTime(0.2, t);
+      oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.45);
+      osc.connect(oscGain);
+      oscGain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.45);
+    } catch (e) {}
+  }
+
+  /**
+   * 보스 출현 경보 사이렌
+   */
+  playBossAlert() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(520, t);
+      osc.frequency.setValueAtTime(740, t + 0.1);
+      osc.frequency.setValueAtTime(520, t + 0.2);
+      osc.frequency.setValueAtTime(740, t + 0.3);
+
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.4);
+    } catch (e) {}
+  }
+
+  /**
+   * 30초 내 보스 격파 승리 팡파르
    */
   playVictory() {
     if (this.isMuted) return;
@@ -192,34 +235,32 @@ class SoundEngine {
     if (!this.ctx) return;
 
     try {
-      const melody = [
-        { f: 523.25, d: 0.1 }, // C5
-        { f: 659.25, d: 0.1 }, // E5
-        { f: 783.99, d: 0.1 }, // G5
-        { f: 1046.5, d: 0.3 }  // C6
-      ];
-      let t = this.ctx.currentTime;
-      melody.forEach(m => {
+      const notes = [392, 523.25, 659.25, 783.99, 1046.5]; // G4, C5, E5, G5, C6
+      const startT = this.ctx.currentTime;
+
+      notes.forEach((freq, idx) => {
+        const t = startT + idx * 0.11;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(m.f, t);
 
-        gain.gain.setValueAtTime(0.25, t);
-        gain.gain.exponentialRampToValueAtTime(0.01, t + m.d);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, t);
+
+        const dur = idx === notes.length - 1 ? 0.45 : 0.09;
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
 
         osc.connect(gain);
         gain.connect(this.ctx.destination);
 
         osc.start(t);
-        osc.stop(t + m.d);
-        t += m.d;
+        osc.stop(t + dur);
       });
     } catch (e) {}
   }
 
   /**
-   * 패배 징글 (패배 시 1회 발동)
+   * 게임 오버 패배 사운드
    */
   playDefeat() {
     if (this.isMuted) return;
@@ -227,31 +268,30 @@ class SoundEngine {
     if (!this.ctx) return;
 
     try {
-      const melody = [
-        { f: 440, d: 0.15 },
-        { f: 415.3, d: 0.15 },
-        { f: 392, d: 0.15 },
-        { f: 349.23, d: 0.35 }
-      ];
-      let t = this.ctx.currentTime;
-      melody.forEach(m => {
+      const notes = [311.13, 293.66, 277.18, 233.08]; // 하강음
+      const startT = this.ctx.currentTime;
+
+      notes.forEach((freq, idx) => {
+        const t = startT + idx * 0.14;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(m.f, t);
 
-        gain.gain.setValueAtTime(0.25, t);
-        gain.gain.exponentialRampToValueAtTime(0.01, t + m.d);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, t);
+
+        const dur = idx === notes.length - 1 ? 0.5 : 0.12;
+        gain.gain.setValueAtTime(0.22, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
 
         osc.connect(gain);
         gain.connect(this.ctx.destination);
 
         osc.start(t);
-        osc.stop(t + m.d);
-        t += m.d;
+        osc.stop(t + dur);
       });
     } catch (e) {}
   }
 }
 
+// 전역 싱글톤 인스턴스
 window.soundEngine = new SoundEngine();

@@ -1,9 +1,9 @@
 /**
- * Quilltale: 8-Bit Turn-Based Battle
+ * Retro Space Invader: 8-Bit Arcade Shooting
  * Storage & Corruption Recovery Module (T02-C22 ~ C25)
  */
 
-const STORAGE_KEY = 'quilltale_battle_save_v1';
+const STORAGE_KEY = 'retro_space_shooter_save_v1';
 
 // 기본 보존 기록 규격 (T02-C24 기본값 선언)
 const DEFAULT_STORAGE = {
@@ -11,7 +11,8 @@ const DEFAULT_STORAGE = {
   totalPlays: 0,
   totalWins: 0,
   totalLosses: 0,
-  bestClearTime: null, // 초 단위 (예: 18.4)
+  highScore: 0,
+  bestClearTime: null, // 초 단위 (예: 21.4)
   soundEnabled: true,
   reducedMotion: false,
   lastPlayedAt: null
@@ -47,13 +48,14 @@ class GameStorage {
         totalPlays: Number.isInteger(parsed.totalPlays) && parsed.totalPlays >= 0 ? parsed.totalPlays : 0,
         totalWins: Number.isInteger(parsed.totalWins) && parsed.totalWins >= 0 ? parsed.totalWins : 0,
         totalLosses: Number.isInteger(parsed.totalLosses) && parsed.totalLosses >= 0 ? parsed.totalLosses : 0,
+        highScore: Number.isInteger(parsed.highScore) && parsed.highScore >= 0 ? parsed.highScore : 0,
         bestClearTime: typeof parsed.bestClearTime === 'number' && parsed.bestClearTime > 0 ? parsed.bestClearTime : null,
         soundEnabled: typeof parsed.soundEnabled === 'boolean' ? parsed.soundEnabled : true,
         reducedMotion: typeof parsed.reducedMotion === 'boolean' ? parsed.reducedMotion : false,
         lastPlayedAt: parsed.lastPlayedAt || null
       };
     } catch (err) {
-      // T02-C25: 손상된 저장값(파싱 실패) 시 중단 없이 기본값으로 자동 복구
+      // T02-C25: 손상된 저장값(파싱 실패) 시 중단 없이 기본값으로 안전 복구
       console.warn('[Storage] 손상된 JSON 감지, 기본값으로 안전 복구:', err);
       return { ...DEFAULT_STORAGE };
     }
@@ -71,10 +73,14 @@ class GameStorage {
   }
 
   /**
-   * 경기 결과 기록 갱신 (보존 기록만 갱신, 현재 판 상태와 엄격히 분리)
+   * 경기 결과 기록 갱신 (보존 기록만 갱신, 현재 판 상태와 엄격히 분리 - T02-C22, C23)
    */
-  recordGameResult(isWin, clearTimeSeconds = null) {
+  recordGameResult(isWin, score = 0, clearTimeSeconds = null) {
     this.data.totalPlays += 1;
+    if (score > this.data.highScore) {
+      this.data.highScore = Math.floor(score);
+    }
+
     if (isWin) {
       this.data.totalWins += 1;
       if (clearTimeSeconds !== null) {

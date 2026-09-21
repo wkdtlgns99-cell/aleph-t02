@@ -3,42 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quilltale: 8-Bit Turn-Based Battle | ALEPH T02</title>
-  <meta name="description" content="Quilltale 8-Bit Turn-Based Battle Mini-game for ALEPH AI Challenge T02">
+  <title>Retro Space Invader: 8-Bit Arcade Shooting | ALEPH T02</title>
+  <meta name="description" content="8-Bit Arcade Space Shooting Mini-game for ALEPH AI Challenge T02">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="app-container" id="gameContainer">
-    <!-- 상단 헤더 -->
+    <!-- 상단 헤더 바 -->
     <header class="header-bar">
       <div class="title-area">
-        <h1>⚔️ QUILLTALE: 8-BIT TURN BATTLE</h1>
-        <div class="sub-title">퀼테일 보스 결전 — 보일러 폐포의 무쇠 골렘 (30초 타임어택)</div>
+        <h1>🚀 RETRO SPACE INVADER</h1>
+        <div class="sub-title">8-Bit 아케이드 우주 함대전 — 30초 보스 결전 타임어택</div>
       </div>
       <div class="top-controls">
-        <span id="gameStateBadge" class="badge badge-ready">대기 중</span>
+        <span id="gameStateBadge" class="badge badge-ready">출격 대기</span>
         <button type="button" id="btnMute" class="util-btn" aria-label="사운드 음소거 토글">🔊 사운드: 켜짐</button>
         <button type="button" id="btnMotion" class="util-btn" aria-label="움직임 줄이기 토글">✨ 움직임: 기본</button>
       </div>
     </header>
 
-    <!-- 메인 2단 그리드 레이아웃 -->
+    <!-- 메인 2단 반응형 그리드 (T02-C10, C11) -->
     <main class="main-grid">
-      <!-- 좌측 사이드바: 상시 게임 규칙 및 조작법 (T02-C03, C04) -->
+      <!-- 좌측 사이드바: 상시 규칙 / 조작법 / 누적 보존 기록 -->
       <aside class="side-panel">
         <!-- 게임 규칙 카드 (T02-C03) -->
         <section class="card" id="rulesPanel" aria-labelledby="rulesTitle">
-          <h2 id="rulesTitle">📜 게임 규칙 (30s 루프)</h2>
+          <h2 id="rulesTitle">📜 게임 규칙 (30초 루프)</h2>
           <ul class="rules-list">
-            <li><strong>승리 조건</strong>: 30초 내 보스 HP를 0으로 만들면 토벌 승리.</li>
-            <li><strong>패배 조건</strong>: 기록관 HP가 0이 되거나 30초 제한 시간이 종료되면 패배.</li>
-            <li><strong>상성 구조</strong>:
-              <br>• [1] 공격: 기본 물리 피해 (18~24)
-              <br>• [2] 룬 영창: 강력 폭발 (36~46, 쿨 1T)
-              <br>• [3] 패링: 적 공격 72% 경감 + 12 반사
-              <br>• [4] 물약: HP +40 회복 (전투당 1회)
+            <li><strong>승리 조건</strong>: 30초 안에 거대 모선(보스)을 격파하면 토벌 승리!</li>
+            <li><strong>패배 조건</strong>: 플레이어 실드(HP)가 0이 되거나 30초 제한 시간이 종료되면 패배.</li>
+            <li><strong>진행 흐름</strong>:
+              <br>• 1단계 (0~5초): 적 정찰기 편대 격추 (점수 획득)
+              <br>• 2단계 (5초~): 거대 외계 모선 출현 및 탄막 교전
             </li>
-            <li><strong>보스 패턴</strong>: 3턴마다 강력한 과열 증기 방출을 시전하므로 [3] 패링이 유효합니다.</li>
+            <li><strong>특수 스킬</strong>: 위기 시 [B] EMP 스마트 폭탄으로 적 탄환 일소 및 보스에게 큰 피해 (판당 1회).</li>
           </ul>
         </section>
 
@@ -46,12 +44,12 @@
         <section class="card" id="controlsPanel" aria-labelledby="controlsTitle">
           <h2 id="controlsTitle">🎮 핵심 조작법</h2>
           <ul class="rules-list">
-            <li><kbd>1</kbd> 또는 버튼: <strong>통상 공격</strong></li>
-            <li><kbd>2</kbd> 또는 버튼: <strong>룬 영창 마법</strong></li>
-            <li><kbd>3</kbd> 또는 버튼: <strong>방어 / 패링</strong></li>
-            <li><kbd>4</kbd> 또는 버튼: <strong>에테르 물약</strong></li>
+            <li><kbd>←</kbd> / <kbd>→</kbd> 또는 <kbd>A</kbd> / <kbd>D</kbd>: <strong>전투기 좌우 이동</strong></li>
+            <li><kbd>Space</kbd> / <kbd>Z</kbd> 또는 발사 버튼: <strong>레이저 발사</strong></li>
+            <li><kbd>B</kbd> 키 또는 폭탄 버튼: <strong>EMP 스마트 폭탄</strong></li>
+            <li>마우스 / 터치: <strong>캔버스 클릭 조준 발사 지원</strong></li>
             <li><kbd>P</kbd> 키: <strong>일시정지 / 재개</strong></li>
-            <li><kbd>R</kbd> 키: <strong>전투 재시작</strong></li>
+            <li><kbd>R</kbd> 키: <strong>게임 즉시 재시작 (초기화)</strong></li>
           </ul>
         </section>
 
@@ -64,78 +62,80 @@
         </section>
       </aside>
 
-      <!-- 우측 중앙 아레나: 캔버스 및 전투 조작 -->
+      <!-- 우측 아레나 영역: 상태 헤더, 캔버스, 조작 버튼, 검증 도구 -->
       <section class="arena-panel">
-        <!-- 상태 게이지 헤더 (T02-C05) -->
+        <!-- 실시간 상태 게이지 헤더 (T02-C05) -->
         <div class="status-header">
-          <!-- 플레이어 상태 -->
+          <!-- 플레이어 실드 -->
           <div class="status-entity">
             <div class="status-label">
-              <span>🧙 기록관 (Player)</span>
-              <span id="playerHpText">100 / 100</span>
+              <span>🛡️ 기체 실드 (Player)</span>
+              <span id="playerShieldText">100 / 100</span>
             </div>
             <div class="hp-bar-outer" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-              <div id="playerHpBar" class="hp-bar-inner hp-player" style="width: 100%;"></div>
+              <div id="playerShieldBar" class="hp-bar-inner hp-player" style="width: 100%;"></div>
             </div>
           </div>
 
-          <!-- 타이머 & 턴 상태 -->
+          <!-- 타이머 & 스코어 중앙 표시 -->
           <div class="status-middle">
             <div id="timerDisplay" class="timer-box" aria-live="polite">30.0s</div>
-            <div id="turnDisplay" class="turn-box">1턴</div>
+            <div id="scoreDisplay" class="score-box">SCORE: 0</div>
           </div>
 
-          <!-- 보스 상태 -->
+          <!-- 보스 모선 상태 -->
           <div class="status-entity">
             <div class="status-label">
-              <span>🤖 무쇠 골렘 (Boss)</span>
-              <span id="bossHpText">110 / 110</span>
+              <span>👾 외계 모선 (Boss)</span>
+              <span id="bossHpText">대기 중</span>
             </div>
-            <div class="hp-bar-outer" role="progressbar" aria-valuenow="110" aria-valuemin="0" aria-valuemax="110">
-              <div id="bossHpBar" class="hp-bar-inner hp-boss" style="width: 100%;"></div>
+            <div class="hp-bar-outer" role="progressbar" aria-valuenow="400" aria-valuemin="0" aria-valuemax="400">
+              <div id="bossHpBar" class="hp-bar-inner hp-boss" style="width: 0%;"></div>
             </div>
           </div>
         </div>
 
-        <!-- 8비트 아케이드 캔버스 화면 -->
+        <!-- 8-Bit 아케이드 캔버스 뷰 -->
         <div class="canvas-wrapper">
-          <canvas id="battleCanvas" width="640" height="300" role="img" aria-label="Quilltale 8비트 턴제 전투 캔버스"></canvas>
+          <canvas id="gameCanvas" width="640" height="340" role="img" aria-label="8비트 우주 슈팅 아케이드 캔버스"></canvas>
+          <div id="overlayMessage" class="canvas-overlay hidden"></div>
         </div>
 
-        <!-- 조작 버튼 그룹 (T02-C04, C06) -->
+        <!-- 온스크린 조작 버튼 그룹 (T02-C04, C06 터치/클릭 접근성) -->
         <div class="action-panel">
-          <button type="button" id="btnAttack" class="action-btn btn-primary" aria-label="1번 통상 공격">
-            <span>[1] 통상 공격</span>
-            <span class="btn-sub">피해 18~24</span>
+          <button type="button" id="btnMoveLeft" class="action-btn btn-nav" aria-label="좌측 이동">
+            <span>◀ 좌로 이동</span>
+            <span class="btn-sub">[← / A]</span>
           </button>
-          <button type="button" id="btnSkill" class="action-btn btn-skill" aria-label="2번 룬 영창 스킬">
-            <span>[2] 룬 영창</span>
-            <span class="btn-sub">피해 36~46 (쿨1T)</span>
+          <button type="button" id="btnShoot" class="action-btn btn-primary" aria-label="레이저 발사">
+            <span>⚡ 레이저 발사</span>
+            <span class="btn-sub">[Space / Z]</span>
           </button>
-          <button type="button" id="btnGuard" class="action-btn btn-guard" aria-label="3번 패링 방어">
-            <span>[3] 패링 방어</span>
-            <span class="btn-sub">경감 72% + 반사</span>
+          <button type="button" id="btnMoveRight" class="action-btn btn-nav" aria-label="우측 이동">
+            <span>우로 이동 ▶</span>
+            <span class="btn-sub">[→ / D]</span>
           </button>
-          <button type="button" id="btnPotion" class="action-btn btn-potion" aria-label="4번 에테르 물약">
-            <span>[4] 에테르 물약</span>
-            <span class="btn-sub">HP +40 (1회)</span>
+          <button type="button" id="btnBomb" class="action-btn btn-bomb" aria-label="EMP 스마트 폭탄">
+            <span>💣 EMP 폭탄</span>
+            <span class="btn-sub" id="bombCountSub">[B] 잔여: 1</span>
           </button>
         </div>
 
-        <!-- 유틸리티 조작 바 -->
+        <!-- 보조 유틸리티 바 (일시정지 / 재시작) -->
         <div class="util-bar">
-          <button type="button" id="btnRestart" class="util-btn">🔄 다시 시작 (초기화)</button>
+          <button type="button" id="btnRestart" class="util-btn">🔄 다시 시작 [R]</button>
           <button type="button" id="btnPause" class="util-btn">⏸️ 일시정지 / 재개 [P]</button>
+          <span id="inputStatText" class="input-stat-badge">발사 반영: 0회</span>
         </div>
 
-        <!-- 전투 로그 콘솔 -->
+        <!-- 전투 시스템 로그 -->
         <div class="combat-log-container" id="combatLog" role="log" aria-live="polite"></div>
 
-        <!-- 평가 기준 검증 도구 (T02-C12, C24, C25 검사관용) -->
+        <!-- T02 공식 평가 기준 즉시 검증 도구 (T02-C12, C24, C25 검사관용) -->
         <section class="inspection-panel" aria-labelledby="inspectionTitle">
-          <h3 id="inspectionTitle">🛠️ T02 평가 기준 즉시 검증 도구</h3>
+          <h3 id="inspectionTitle">🛠️ T02 평가 기준 원클릭 검증 도구</h3>
           <p class="inspection-desc">
-            평가관 및 사용자가 기준 충족을 즉시 확인할 수 있도록 원클릭 검사 트리거를 제공합니다.
+            평가관 및 학생이 기준 충족 여부를 즉시 검증할 수 있도록 제공되는 실시간 테스트 트리거입니다.
           </p>
           <div class="inspection-btn-group">
             <button type="button" id="btnRapidTest" class="util-btn" title="1초 내 10회 연속 입력 이벤트 검사 (T02-C12)">
@@ -144,16 +144,22 @@
             <button type="button" id="btnCorruptTest" class="util-btn" title="손상된 JSON 주입 후 기본값 자동 복구 검사 (T02-C25)">
               🧪 [T02-C25] 저장값 손상 복구 시험
             </button>
+            <button type="button" id="btnTenMinTest" class="util-btn" title="10분 연속 실행 및 콘솔 무오류 시뮬레이션 검사 (T02-C16, C17)">
+              ⏱️ [T02-C16,17] 10분 연속실행 검사
+            </button>
             <button type="button" id="btnResetStorage" class="util-btn" title="localStorage 보존 기록 완전 삭제">
               🗑️ 저장 기록 완전 초기화
             </button>
+          </div>
+          <div id="inspectionResult" class="inspection-result-box" aria-live="polite">
+            검사 준비 완료. 원하는 검사 버튼을 클릭하세요.
           </div>
         </section>
       </section>
     </main>
   </div>
 
-  <!-- 스크립트 모듈 로드 -->
+  <!-- 스크립트 모듈 순차 로드 -->
   <script src="storage.js"></script>
   <script src="audio.js"></script>
   <script src="game.js"></script>
